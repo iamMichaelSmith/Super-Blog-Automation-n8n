@@ -1,278 +1,219 @@
-# Super-Blog
+Super Blog Automation
+Automated Research-Driven Blog Generation System
+Project Overview
 
-Perfect. Below is a **clean, employment ready project write up** you can paste directly into **Notion and GitHub**.
-It is written to speak to **automation engineer**, **workflow developer**, **AI automation specialist**, and **technical operations** roles.
-No fluff. Clear architecture. Clear business value.
+A stakeholder required a reliable system that could automatically generate credible, research-informed blog content and deliver it for review without manual intervention. The content needed to remain contextually relevant, research grounded, and production ready, while minimizing human time spent on drafting, formatting, and sourcing.
 
----
-
-# SuperBlog 
-
-**Automated Research Driven Blog Generation System**
-
-## Project Overview
-
-A stakeholder required a reliable system that could automatically generate **credible, research informed blog content** and deliver it for review without manual intervention. The content needed to remain **contextually relevant**, **research grounded**, and **production ready**, while minimizing human time spent on drafting, formatting, and sourcing.
-
-SuperBlog was designed to solve this by combining **AI orchestration**, **external research tools**, and **email automation** into a single end to end workflow using **n8n**.
+Super Blog Automation was designed to solve this by combining AI orchestration, external research tools, and email automation into a single end to end workflow using n8n.
 
 The result is a system that produces structured blog articles based on real research inputs and sends the final output directly to email for stakeholder approval.
 
----
+What You Need To Run This
 
-## Business Problem
+To import and execute this workflow, you will need access to the following services and credentials.
+
+Required
+
+n8n (Cloud or self-hosted)
+
+OpenAI API key
+Used for planning, keyword extraction, writing sections, editing, and title generation.
+
+Tavily API key
+Used for web research and source discovery.
+
+Perplexity API key
+Used for research grounding and structured research summaries.
+
+Gmail OAuth credentials (or Gmail node configured in n8n)
+Used to email the finished blog to a recipient.
+
+Optional
+
+SerpAPI key
+Used for additional search coverage. Helpful but not required if Tavily and Perplexity are sufficient.
+
+Setup and Installation
+
+Import the workflow JSON into n8n:
+
+Workflows → Import from file → select the workflow JSON
+
+Attach credentials inside n8n:
+
+OpenAI credential on all OpenAI nodes
+
+Tavily credential on Tavily nodes
+
+Perplexity credential on Perplexity nodes
+
+Gmail OAuth credential on the Gmail node
+
+Optional SerpAPI credential if enabled
+
+Update recipient email:
+
+Change the Gmail node Send To field to your preferred approval address
+
+Run a test:
+
+Execute workflow
+
+Submit the form with a topic, tone, audience, and notes
+
+Confirm the email arrives with the final blog HTML
+
+Security Notes
+
+This repo intentionally excludes private data.
+
+No API keys are stored
+
+No Gmail OAuth tokens are stored
+
+Workflow exports should remove credentials blocks before publishing to GitHub
+
+Replace any personal emails with placeholders before sharing
+
+Business Problem
 
 Manual blog creation introduced several issues:
 
-* Inconsistent research quality
-* High time cost for drafting and formatting
-* Difficulty scaling content production
-* No standardized process for source validation
-* Delays in stakeholder review cycles
+Inconsistent research quality
+
+High time cost for drafting and formatting
+
+Difficulty scaling content production
+
+No standardized process for source validation
+
+Delays in stakeholder review cycles
 
 The stakeholder needed a solution that:
 
-* Reduced human involvement
-* Ensured research-backed content
-* Produced consistent structure and tone
-* Delivered outputs directly to decision makers
+Reduced human involvement
 
----
+Ensured research-backed content
 
-## Solution Summary
+Produced consistent structure and tone
 
-SuperBlog is an **event driven automation workflow** that:
+Delivered outputs directly to decision makers
 
-1. Collects structured input from a stakeholder
-2. Performs external research
-3. Generates SEO aware blog content
-4. Assembles the final article
-5. Emails the result automatically
+Solution Summary
 
-The system acts as a **content production pipeline**, not just a text generator.
+Super Blog Automation is an event-driven automation workflow that:
 
----
+Collects structured input from a stakeholder
 
-## Key Technologies Used
+Performs external research using search tools
 
-* **n8n** for workflow orchestration
-* **OpenAI (GPT models)** for content generation
-* **Tavily** for web research
-* **Perplexity** for contextual research grounding
-* **SerpAPI** for additional search context
-* **Gmail API** for automated delivery
-* **JSON structured outputs** for data reliability
+Generates SEO aware blog content using LLM orchestration
 
----
+Assembles the final article in HTML
 
-## High Level Architecture
+Emails the result automatically for stakeholder review
+
+The system acts as a content production pipeline, not just a text generator.
+
+Key Technologies Used
+
+n8n for workflow orchestration
+
+OpenAI GPT models for content generation and editing
+
+Tavily for web research
+
+Perplexity for contextual research grounding
+
+SerpAPI for supplemental research coverage
+
+Gmail API for automated delivery
+
+JSON structured outputs for reliability and automation safety
+
+High-Level Architecture
 
 The workflow is modular and follows a clear pipeline pattern:
 
-**Input → Research → Planning → Writing → Assembly → Delivery**
+Input → Research → Planning → Writing → Assembly → Delivery
 
 Each stage is isolated, making the system easier to debug, scale, and extend.
 
----
+Node by Node Breakdown
+1. Form Trigger
 
-## Node by Node Breakdown
+Purpose: Captures stakeholder requirements.
+What it does: Collects topic, tone, audience, and notes in a structured input format.
 
-### 1. Form Trigger (Input Layer)
+2. Research Tools
 
-**Purpose:**
-Captures stakeholder requirements.
+Purpose: Provide factual grounding and reduce hallucinated content.
+Tools: Tavily, Perplexity, optional SerpAPI.
+What they do: Search relevant web sources, provide current context, and supply research material that guides the content pipeline.
 
-**What it does:**
+3. Blog Agent
 
-* Collects Topic
-* Collects Tone
-* Collects Target Audience
-* Collects Notes or context
+Purpose: Create a narrative structure for the blog.
+What it does: Produces a logical table of contents that flows naturally and starts with a hook designed for the target audience.
 
-This ensures the system starts with structured, non-ambiguous input.
+4. Keyword Extractor
 
----
+Purpose: Extract SEO relevant keywords based on research output.
+What it does: Produces primary and secondary keyword lists with formatting constraints to support search intent and on page SEO consistency.
 
-### 2. Research Tools (Data Enrichment Layer)
+5. Project Planner
 
-**Tools Used:** Tavily, Perplexity, SerpAPI
+Purpose: Convert the blog outline into machine readable JSON.
+What it does: Transforms the outline into structured sections with clear titles and descriptions, enabling repeatable automation.
 
-**Purpose:**
-Provide factual grounding and reduce hallucinated content.
+6. Split Out
 
-**What they do:**
+Purpose: Process each blog section independently.
+What it does: Creates one item per section to support scalable section writing.
 
-* Search relevant web sources
-* Provide current context
-* Supply data for SEO keyword extraction
-* Assist AI agents during planning and writing
+7. Research Team
 
-These tools are injected into the workflow as **AI tools**, allowing the language model to pull real world information.
+Purpose: Write the final content for each section.
+What it does: Uses research tools for grounding, outputs HTML, follows tone and audience rules, and generates clean structured section content.
 
----
+8. Merge and Aggregate
 
-### 3. Blog Agent (Planning Layer)
+Purpose: Recombine all written sections.
+What it does: Merges parallel section outputs, aggregates section content, and preserves ordering for coherent assembly.
 
-**Purpose:**
-Create a narrative structure for the blog.
+9. Editor
 
-**What it does:**
+Purpose: Assemble and polish the final blog.
+What it does: Adds an intro hook, improves flow, injects SEO keywords, enforces output formatting and constraints, adds backlinks, and builds the final Sources section.
 
-* Analyzes topic, tone, audience, and research context
-* Generates a logical table of contents
-* Ensures the first section hooks the reader with a scenario or question
-* Maintains storytelling flow across sections
+10. Title Generator
 
-This prevents disorganized or generic blog structures.
+Purpose: Create a compelling title aligned with the stakeholder voice.
+What it does: Generates a question style title matching tone and audience.
 
----
+11. Email Delivery
 
-### 4. Keyword Extractor (SEO Layer)
+Purpose: Deliver the final output to stakeholders.
+What it does: Emails the completed HTML blog using the generated title as the subject, enabling immediate review without logging into n8n.
 
-**Purpose:**
-Extract SEO relevant keywords based on research output.
+Why This Matters for Employers
 
-**What it does:**
+This project demonstrates production-relevant automation and workflow engineering skills:
 
-* Generates primary keywords (long tail phrases)
-* Generates secondary keywords (supporting phrases)
-* Enforces formatting rules (lowercase, no punctuation)
-* Avoids duplicate or invented terms
+Workflow orchestration and event-driven automation
 
-This allows SEO considerations to be injected later without polluting the writing stage.
+LLM orchestration with structured outputs and constraints
 
----
+API integration across multiple services
 
-### 5. Project Planner (Data Structuring Layer)
+Modular pipeline design and separation of concerns
 
-**Purpose:**
-Convert the blog outline into machine-readable JSON.
+Scalable processing using split and merge patterns
 
-**What it does:**
+Output validation and production-minded delivery workflows
 
-* Splits the table of contents into structured sections
-* Assigns titles and descriptions
-* Outputs clean JSON only
+This is a repeatable automation system that aligns technical execution with business goals.
 
-This step is critical for automation reliability and prevents parsing errors downstream.
+Final Summary
 
----
-
-### 6. Split Out (Parallelization Layer)
-
-**Purpose:**
-Process each blog section independently.
-
-**What it does:**
-
-* Takes the JSON sections
-* Creates one execution item per section
-
-This enables scalable writing and prevents cross-contamination between sections.
-
----
-
-### 7. Research Team (Content Generation Layer)
-
-**Purpose:**
-Write the final content for each section.
-
-**What it does:**
-
-* Uses research tools for factual grounding
-* Writes clean HTML output
-* Follows strict formatting rules
-* Avoids inline citations and links
-* Produces human-readable, audience-appropriate content
-
-Each section is written in isolation for consistency.
-
----
-
-### 8. Merge and Aggregate (Assembly Layer)
-
-**Purpose:**
-Recombine all written sections.
-
-**What it does:**
-
-* Merges outputs from parallel section writing
-* Aggregates titles and HTML content
-* Preserves the original order
-
-This ensures the final blog reads cohesively.
-
----
-
-### 9. Editor (Final Composition Layer)
-
-**Purpose:**
-Assemble and polish the final blog.
-
-**What it does:**
-
-* Adds a short opening scenario
-* Improves flow and readability
-* Injects static and dynamic SEO keywords
-* Adds required backlinks
-* Builds a Sources section at the end
-* Enforces formatting and length constraints
-
-This node acts as the final quality control step.
-
----
-
-### 10. Title Generator (Presentation Layer)
-
-**Purpose:**
-Create a compelling blog title.
-
-**What it does:**
-
-* Generates a sarcastic, engaging question-style title
-* Matches tone and audience
-* Outputs clean plain text
-
-This separates content quality from headline optimization.
-
----
-
-### 11. Email Delivery (Distribution Layer)
-
-**Purpose:**
-Deliver the final output to stakeholders.
-
-**What it does:**
-
-* Sends the completed HTML blog via email
-* Uses the generated title as the subject
-* Enables immediate review without logging into n8n
-
-This closes the automation loop.
-
----
-
-## Why This Matters for Employers
-
-This project demonstrates real-world automation skills, including:
-
-* Workflow orchestration
-* AI agent coordination
-* External API integration
-* Data normalization and validation
-* Parallel processing
-* Modular system design
-* Production-oriented error reduction
-* Business-driven automation thinking
-
-This is not a demo chatbot. It is a **repeatable business system**.
-
----
-
-
-## Final Summary
-
-SuperBlog was designed to address a real business challenge by leveraging modern automation principles. It shows how AI, research APIs, and workflow orchestration can be combined into a scalable, production-ready system that delivers value immediately.
-
-This project reflects my approach to automation: **clear inputs, controlled outputs, modular design, and business-first thinking**.
-
+Super Blog Automation was built to address a real business need by combining research tooling, AI generation, and workflow automation. It demonstrates a structured approach to building scalable pipelines with clear inputs, controlled outputs, and stakeholder delivery built in.
