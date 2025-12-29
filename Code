@@ -1,0 +1,352 @@
+{
+  "name": "Super Blog Agent v2 Optimized",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Blog Idea Submission",
+        "formDescription": "Provide a structured blog based on the following fields",
+        "formFields": {
+          "values": [
+            { "fieldLabel": "Topic", "placeholder": "Topic", "requiredField": true },
+            {
+              "fieldLabel": "Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  { "option": "Professional" },
+                  { "option": "Sarcastic" },
+                  { "option": "Chill" },
+                  { "option": "Informative" }
+                ]
+              },
+              "multiselect": true,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Audience",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  { "option": "Independent Artists" },
+                  { "option": "Music Producers" },
+                  { "option": "Small Labels" },
+                  { "option": "Recording Studio Owners" },
+                  { "option": "Musicians" },
+                  { "option": "Men" },
+                  { "option": "Woman" },
+                  { "option": "Everybody" }
+                ]
+              },
+              "multiselect": true,
+              "requiredField": true
+            },
+            { "fieldLabel": "Notes", "requiredField": true }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [120, 0],
+      "id": "v2-form",
+      "name": "On form submission"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nreturn [{\n  topic: input.Topic,\n  tone: Array.isArray(input.Tone) ? input.Tone.join(\", \") : input.Tone,\n  audience: Array.isArray(input.Audience) ? input.Audience.join(\", \") : input.Audience,\n  notes: input.Notes,\n  staticKeywords: [\"Recording Studio\", \"Austin\", \"Mixing & Mastering\", \"Music Production\"],\n  backlinkUrl: \"https://www.BlakMarigold.com\",\n  maxWords: 1000\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [340, 0],
+      "id": "v2-normalize",
+      "name": "Normalize Inputs"
+    },
+    {
+      "parameters": {
+        "query": "={{ $json.topic }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [560, -120],
+      "id": "v2-tavily",
+      "name": "Research Tavily"
+    },
+    {
+      "parameters": {
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "=You are a research assistant. Search the web and return a structured research report.\nInclude 5 to 7 sources.\nReturn JSON only in this exact structure:\n{\n  \"summary\": \"...\",\n  \"key_points\": [\"...\"],\n  \"sources\": [{\"title\":\"...\",\"url\":\"...\",\"publisher\":\"...\"}]\n}\n",
+              "role": "system"
+            },
+            { "content": "={{ \"Research topic: \" + $json.topic + \". Notes: \" + $json.notes }}" }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [560, 120],
+      "id": "v2-perplexity",
+      "name": "Research Perplexity"
+    },
+    {
+      "parameters": {
+        "jsCode": "const tavily = $items(\"Research Tavily\")[0]?.json;\nconst pplx = $items(\"Research Perplexity\")[0]?.json;\n\nreturn [{\n  researchPack: {\n    tavily,\n    perplexity: pplx,\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 0],
+      "id": "v2-pack",
+      "name": "Build Research Pack"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an SEO research assistant.\nUse ONLY the researchPack provided. Do not invent keywords.\nRules:\n1. Primary keywords must be 5 to 6 word high value phrases.\n2. Secondary keywords are supporting phrases max 9 words.\n3. All lowercase.\n4. No punctuation.\n5. No duplicates between lists.\nReturn JSON only:\n{\n  \"primary_keywords\": [\"...\"],\n  \"secondary_keywords\": [\"...\"]\n}\n\nContext:\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nNotes: {{ $items(\"Normalize Inputs\")[0].json.notes }}\nResearch Pack: {{ JSON.stringify($json.researchPack) }}\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [1000, 0],
+      "id": "v2-keywords",
+      "name": "Keyword Extractor v2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a blog outline as strict JSON.\nConstraints:\n1. 4 to 6 sections.\n2. Each section must have sectionIndex starting at 1.\n3. No dashes in titles or descriptions.\n4. Titles must be clear and clickable.\nReturn JSON only:\n{\n  \"blogSections\": [\n    {\"sectionIndex\":1,\"title\":\"...\",\"description\":\"...\"}\n  ]\n}\n\nInputs:\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nTone: {{ $items(\"Normalize Inputs\")[0].json.tone }}\nAudience: {{ $items(\"Normalize Inputs\")[0].json.audience }}\nNotes: {{ $items(\"Normalize Inputs\")[0].json.notes }}\nResearch Pack: {{ JSON.stringify($items(\"Build Research Pack\")[0].json.researchPack) }}\n\nAlso ensure the first section is a hook that starts with a short scenario or question.\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [1220, 0],
+      "id": "v2-outline",
+      "name": "Outline Planner v2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message.content.blogSections",
+        "include": "noOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1440, 0],
+      "id": "v2-split",
+      "name": "Split Sections"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write the final content for this section only.\n\nSection Index: {{ $json.sectionIndex }}\nSection Title: {{ $json.title }}\nSection Description: {{ $json.description }}\n\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nTone: {{ $items(\"Normalize Inputs\")[0].json.tone }}\nAudience: {{ $items(\"Normalize Inputs\")[0].json.audience }}\nNotes: {{ $items(\"Normalize Inputs\")[0].json.notes }}\n\nResearch Pack: {{ JSON.stringify($items(\"Build Research Pack\")[0].json.researchPack) }}\n\nRules:\n1. Output HTML only.\n2. Include at least 2 inline citations as HTML links using URLs from the research pack.\n3. Do not add a Sources section here.\n4. No dashes.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [1660, 0],
+      "id": "v2-section-writer",
+      "name": "Section Writer"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst sections = items.map(i => {\n  const j = i.json;\n  return {\n    sectionIndex: j.sectionIndex,\n    title: j.title,\n    description: j.description,\n    html: j.output || j.text || j.content || j\n  };\n});\n\nsections.sort((a,b) => (a.sectionIndex||0) - (b.sectionIndex||0));\n\nreturn [{ sections }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1880, 0],
+      "id": "v2-collect",
+      "name": "Collect And Sort"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert editor. Build a single HTML blog from the sections.\n\nRequirements:\n1. Start with a 3 to 5 sentence scenario hook that clearly states who this blog is for.\n2. Then include each section as an H2 followed by its HTML content.\n3. Preserve all inline citations already present.\n4. Add ONE Sources section at the end as:\n<h2>Sources</h2>\n<ul>\n<li><a href=\"url\">publisher title</a></li>\n</ul>\nOnly use URLs that appear in the inline citations or research pack.\n5. No dashes.\n6. Max words: {{ $items(\"Normalize Inputs\")[0].json.maxWords }}\n\nStatic keywords must appear exactly once each:\n{{ $items(\"Normalize Inputs\")[0].json.staticKeywords.join(\", \") }}\n\nDynamic keywords:\nPrimary: {{ $items(\"Keyword Extractor v2\")[0].json.message.content.primary_keywords }}\nSecondary: {{ $items(\"Keyword Extractor v2\")[0].json.message.content.secondary_keywords }}\n\nBacklink rules:\nInsert a backlink to {{ $items(\"Normalize Inputs\")[0].json.backlinkUrl }} at least once in the body.\nAdd one short closing line with another backlink at the end.\n\nInputs:\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nTone: {{ $items(\"Normalize Inputs\")[0].json.tone }}\nAudience: {{ $items(\"Normalize Inputs\")[0].json.audience }}\nSections JSON: {{ JSON.stringify($json.sections) }}\nResearch Pack: {{ JSON.stringify($items(\"Build Research Pack\")[0].json.researchPack) }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [2100, 0],
+      "id": "v2-final-editor",
+      "name": "Final Editor"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $json.output || \"\";\nconst text = html.replace(/<[^>]*>/g, \" \").replace(/\\s+/g, \" \").trim();\nconst words = text ? text.split(\" \").length : 0;\nconst hasSources = /<h2>\\s*Sources\\s*<\\/h2>/i.test(html);\nconst hasBacklink = /https:\\/\\/www\\.BlakMarigold\\.com/i.test(html);\nconst linkCount = (html.match(/<a\\s+href=/gi) || []).length;\n\nreturn [{\n  wordCount: words,\n  hasSources,\n  hasBacklink,\n  linkCount,\n  html\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2320, 0],
+      "id": "v2-qc",
+      "name": "Quality Check"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            { "value1": "={{ $json.hasSources }}", "value2": true },
+            { "value1": "={{ $json.hasBacklink }}", "value2": true }
+          ],
+          "number": [
+            { "value1": "={{ $json.wordCount }}", "operation": "smallerEqual", "value2": 1000 },
+            { "value1": "={{ $json.linkCount }}", "operation": "largerEqual", "value2": 6 }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2540, 0],
+      "id": "v2-if",
+      "name": "Pass Quality Gate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Fix this HTML to pass the quality gate.\nRules:\n1. Preserve all existing citations.\n2. Ensure Sources section exists and includes all cited URLs.\n3. Ensure at least 6 inline links total.\n4. Ensure at least one backlink to https://www.BlakMarigold.com in the body and one in the closing line.\n5. Ensure word count is 1000 or less.\n6. No dashes.\nReturn HTML only.\n\nHTML:\n{{ $json.html }}\n",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [2760, 140],
+      "id": "v2-fixer",
+      "name": "Auto Fixer"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a title for this blog. Tone: {{ $items(\"Normalize Inputs\")[0].json.tone }}. Audience: {{ $items(\"Normalize Inputs\")[0].json.audience }}.\nRules:\n1. Plain text only.\n2. Capitalize First Letter In Each Word.\n3. Every title is a sarcastic question.\nNo dashes.\n\nBlog HTML:\n{{ $json.html || $json.message.content }}\n",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [2980, 0],
+      "id": "v2-title",
+      "name": "Create Title v2"
+    },
+    {
+      "parameters": {
+        "sendTo": "example@company.com",
+        "subject": "={{ $items(\"Create Title v2\")[0].json.message.content || $items(\"Create Title v2\")[0].json.output }}",
+        "message": "={{ $json.html || $json.message.content || $json.output }}",
+        "options": { "senderName": "Blog Approval" }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [3200, 0],
+      "id": "v2-email",
+      "name": "Email Blog v2"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [[{ "node": "Normalize Inputs", "type": "main", "index": 0 }]]
+    },
+    "Normalize Inputs": {
+      "main": [
+        [
+          { "node": "Research Tavily", "type": "main", "index": 0 },
+          { "node": "Research Perplexity", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Research Tavily": {
+      "main": [[{ "node": "Build Research Pack", "type": "main", "index": 0 }]]
+    },
+    "Research Perplexity": {
+      "main": [[{ "node": "Build Research Pack", "type": "main", "index": 0 }]]
+    },
+    "Build Research Pack": {
+      "main": [[{ "node": "Keyword Extractor v2", "type": "main", "index": 0 }]]
+    },
+    "Keyword Extractor v2": {
+      "main": [[{ "node": "Outline Planner v2", "type": "main", "index": 0 }]]
+    },
+    "Outline Planner v2": {
+      "main": [[{ "node": "Split Sections", "type": "main", "index": 0 }]]
+    },
+    "Split Sections": {
+      "main": [[{ "node": "Section Writer", "type": "main", "index": 0 }]]
+    },
+    "Section Writer": {
+      "main": [[{ "node": "Collect And Sort", "type": "main", "index": 0 }]]
+    },
+    "Collect And Sort": {
+      "main": [[{ "node": "Final Editor", "type": "main", "index": 0 }]]
+    },
+    "Final Editor": {
+      "main": [[{ "node": "Quality Check", "type": "main", "index": 0 }]]
+    },
+    "Quality Check": {
+      "main": [[{ "node": "Pass Quality Gate", "type": "main", "index": 0 }]]
+    },
+    "Pass Quality Gate": {
+      "main": [
+        [{ "node": "Create Title v2", "type": "main", "index": 0 }],
+        [{ "node": "Auto Fixer", "type": "main", "index": 0 }]
+      ]
+    },
+    "Auto Fixer": {
+      "main": [[{ "node": "Create Title v2", "type": "main", "index": 0 }]]
+    },
+    "Create Title v2": {
+      "main": [[{ "node": "Email Blog v2", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "v2",
+  "meta": { "templateCredsSetupCompleted": false }
+}
