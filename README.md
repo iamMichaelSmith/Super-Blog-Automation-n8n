@@ -1,210 +1,102 @@
 # Super Blog Automation  
-**Automated Research-Driven Blog Generation System**
+**Cloud-Native Research-Driven Blog Automation Workflow**
 
 ---
 
 ## Project Overview
 
-A stakeholder required a reliable system that could automatically generate **credible, research-informed blog content** and deliver it for review **without manual intervention**. The content needed to remain **contextually relevant**, **research-grounded**, and **production-ready**, while minimizing human time spent on drafting, formatting, and sourcing.
+Super Blog Automation is a **cloud-native automation workflow** built with **n8n** that generates **credible, research-backed blog content** and delivers it directly to stakeholders via email.
 
-**Super Blog Automation** was designed to solve this by combining **AI orchestration**, **external research tools**, and **email automation** into a single end-to-end workflow using **n8n**.
+It orchestrates **LLM-based content generation**, **external research APIs**, and **automated delivery** into a single, repeatable system designed to replace manual content production workflows.
 
-The result is a system that produces **structured blog articles based on real research inputs** and sends the final output **directly to email for stakeholder approval**.
+This project demonstrates how to design **event-driven automation pipelines** that prioritize reliability, security, and business outcomes.
 
 ![n8n Super Blog Automation](n8n%20Super%20Blog%20Automation%20-%20n8n.png)
 ---
 
-## What You Need to Run This
+## Why Super Blog Automation
 
-To import and execute this workflow, you will need access to the following services and credentials.
+This project was created to solve common content production challenges:
 
-### Required Services
+- Manual research and writing does not scale
+- Research quality is inconsistent
+- Review and approval cycles slow delivery
+- Content pipelines lack automation and validation
 
-- **n8n** (Cloud or self-hosted)
-- **OpenAI API Key**  
-  Used for planning, keyword extraction, section writing, editing, and title generation.
-- **Tavily API Key**  
-  Used for web research and source discovery.
-- **Perplexity API Key**  
-  Used for contextual research grounding and structured research summaries.
-- **Gmail OAuth Credentials**  
-  Used to email the completed blog to stakeholders.
-
-### Optional Services
-
-- **SerpAPI Key**  
-  Provides additional search coverage. Helpful but not required if Tavily and Perplexity are sufficient.
+Super Blog Automation turns these steps into a **single automated workflow** with clear inputs, controlled outputs, and stakeholder delivery built in.
 
 ---
 
-## Setup and Installation
+## What You Need to Run This
 
-1. **Import the workflow**
-   - Open n8n
-   - Go to **Workflows → Import from file**
-   - Select the provided workflow JSON
+### Required
+- **n8n** (Cloud or self-hosted)
+- **OpenAI API key** (content generation and editing)
+- **Tavily API key** (web research)
+- **Perplexity API key** (research grounding)
+- **Gmail OAuth credentials** (email delivery)
 
-2. **Attach credentials**
-   - OpenAI credentials on all OpenAI nodes
-   - Tavily credentials on Tavily nodes
-   - Perplexity credentials on Perplexity nodes
-   - Gmail OAuth credentials on the Gmail node
-   - Optional SerpAPI credentials if enabled
-
-3. **Configure email delivery**
-   - Update the Gmail node with your preferred recipient address
-
-4. **Run a test**
-   - Execute the workflow
-   - Submit the form with a topic, tone, audience, and notes
-   - Confirm the final blog arrives via email
+### Optional
+- **SerpAPI key** (supplemental research coverage)
 
 ---
 
 ## Security Notes
 
-This repository intentionally excludes all sensitive information.
+This repository intentionally excludes all sensitive data.
 
 - No API keys are stored
-- No Gmail OAuth tokens are included
-- All credentials must be added manually after import
-- Email addresses are placeholders only
+- No OAuth tokens are included
+- Credentials are attached manually after import
+- Email addresses use placeholders
 
-This follows best practices for **secure automation workflows** and **public repositories**.
-
----
-
-## Business Problem
-
-Manual blog creation introduced several challenges:
-
-- Inconsistent research quality
-- High time cost for drafting and formatting
-- Difficulty scaling content production
-- No standardized process for source validation
-- Delays in stakeholder review cycles
-
-The stakeholder needed a solution that:
-
-- Reduced human involvement
-- Ensured research-backed content
-- Produced consistent structure and tone
-- Delivered outputs directly to decision makers
-
----
-
-## Solution Summary
-
-**Super Blog Automation** is an **event-driven automation workflow** that:
-
-1. Collects structured input from a stakeholder
-2. Performs external research using search APIs
-3. Generates SEO-aware blog content using LLM orchestration
-4. Assembles the final article in HTML
-5. Emails the result automatically for review
-
-The system functions as a **content production pipeline**, not just a text generator.
-
----
-
-## Key Technologies Used
-
-- **n8n** – Workflow orchestration
-- **OpenAI GPT Models** – Content generation and editing
-- **Tavily** – Web research
-- **Perplexity** – Contextual research grounding
-- **SerpAPI** – Supplemental search coverage
-- **Gmail API** – Automated delivery
-- **JSON Structured Outputs** – Reliability and automation safety
+This reflects **production best practices** for automation workflows shared publicly.
 
 ---
 
 ## High-Level Architecture
 
-The workflow follows a modular pipeline:
-
 **Input → Research → Planning → Writing → Assembly → Delivery**
 
-Each stage is isolated to improve **debuggability**, **scalability**, and **maintainability**.
+Each stage is modular and isolated, enabling easier debugging, scaling, and extension.
 
 ---
 
-## Node-by-Node Breakdown
+## Key Components
 
-### 1. Form Trigger (Input Layer)
-Captures structured stakeholder requirements including topic, tone, audience, and notes.
-
----
-
-### 2. Research Tools (Data Enrichment Layer)
-Uses Tavily, Perplexity, and optional SerpAPI to provide real-world context and reduce hallucinated content.
-
----
-
-### 3. Blog Agent (Planning Layer)
-Generates a logical table of contents with narrative flow and a strong opening hook.
+- **Form Trigger** – Collects structured stakeholder input
+- **Research Layer** – Gathers real-world context using search APIs
+- **Planning Agent** – Generates structured outlines and flow
+- **SEO Agent** – Extracts research-derived keywords
+- **Section Writers** – Produce HTML content per section
+- **Editor** – Assembles, validates, and formats final output
+- **Email Delivery** – Sends completed content for review
 
 ---
 
-### 4. Keyword Extractor (SEO Layer)
-Produces primary and secondary keyword lists derived strictly from research outputs.
+## Setup
+
+1. Import the workflow JSON into n8n
+2. Attach your own API credentials
+3. Configure the email recipient
+4. Execute the workflow and submit the form
 
 ---
 
-### 5. Project Planner (Data Structuring Layer)
-Converts the outline into machine-readable JSON sections for reliable automation.
+## Why This Matters
 
----
-
-### 6. Split Out (Parallelization Layer)
-Processes each blog section independently to enable scalable writing.
-
----
-
-### 7. Research Team (Content Generation Layer)
-Writes clean HTML content per section using research grounding and formatting rules.
-
----
-
-### 8. Merge and Aggregate (Assembly Layer)
-Recombines all written sections while preserving order and structure.
-
----
-
-### 9. Editor (Final Composition Layer)
-Assembles the final blog, improves readability, injects SEO keywords, adds backlinks, and builds the Sources section.
-
----
-
-### 10. Title Generator (Presentation Layer)
-Creates an engaging, tone-matched, question-style blog title.
-
----
-
-### 11. Email Delivery (Distribution Layer)
-Emails the completed blog to stakeholders for immediate review.
-
----
-
-## Why This Matters for Employers
-
-This project demonstrates production-level automation skills including:
-
-- Workflow orchestration
+This project demonstrates:
+- Workflow orchestration and event-driven automation
 - LLM orchestration with structured outputs
 - External API integration
-- Parallel processing patterns
-- Modular system design
-- Business-driven automation thinking
 - Secure credential handling
+- Modular system design focused on real business use cases
 
-This is a **repeatable, real-world automation system**, not a demo.
+It is a **production-oriented automation system**, not a demo or tutorial.
 
 ---
 
-## Final Summary
+## License
+MIT
 
-**Super Blog Automation** addresses a real business challenge using modern automation principles. It demonstrates how AI, research APIs, and workflow orchestration can be combined into a **scalable, production-ready content pipeline**.
 
-This project reflects my approach to automation:  
-**clear inputs, controlled outputs, modular design, and business-first thinking**.
