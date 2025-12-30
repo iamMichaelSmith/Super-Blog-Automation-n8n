@@ -11,6 +11,7 @@ A stakeholder required a reliable system that could automatically generate **cre
 
 The result is a system that produces **structured blog articles based on real research inputs** and sends the final output **directly to email for stakeholder approval**.
 
+![n8n Super Blog Automation](n8n%20Super%20Blog%20Automation%20-%20n8n.png)
 ---
 
 ## What You Need to Run This
