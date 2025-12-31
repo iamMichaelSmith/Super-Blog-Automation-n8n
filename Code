@@ -1,5 +1,5 @@
 {
-  "name": "Super Blog Agent v2 Optimized",
+  "name": "Studio-Super Blog Automation Master",
   "nodes": [
     {
       "parameters": {
@@ -7,16 +7,28 @@
         "formDescription": "Provide a structured blog based on the following fields",
         "formFields": {
           "values": [
-            { "fieldLabel": "Topic", "placeholder": "Topic", "requiredField": true },
+            {
+              "fieldLabel": "Topic",
+              "placeholder": "Topic",
+              "requiredField": true
+            },
             {
               "fieldLabel": "Tone",
               "fieldType": "dropdown",
               "fieldOptions": {
                 "values": [
-                  { "option": "Professional" },
-                  { "option": "Sarcastic" },
-                  { "option": "Chill" },
-                  { "option": "Informative" }
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Sarcastic"
+                  },
+                  {
+                    "option": "Chill"
+                  },
+                  {
+                    "option": "Informative"
+                  }
                 ]
               },
               "multiselect": true,
@@ -27,81 +39,114 @@
               "fieldType": "dropdown",
               "fieldOptions": {
                 "values": [
-                  { "option": "Independent Artists" },
-                  { "option": "Music Producers" },
-                  { "option": "Small Labels" },
-                  { "option": "Recording Studio Owners" },
-                  { "option": "Musicians" },
-                  { "option": "Men" },
-                  { "option": "Woman" },
-                  { "option": "Everybody" }
+                  {
+                    "option": "Independent Artists"
+                  },
+                  {
+                    "option": "Music Producers"
+                  },
+                  {
+                    "option": "Small Labels"
+                  },
+                  {
+                    "option": "Recording Studio Owners"
+                  },
+                  {
+                    "option": "Musicians"
+                  },
+                  {
+                    "option": "Men"
+                  },
+                  {
+                    "option": "Woman"
+                  },
+                  {
+                    "option": "Everybody"
+                  }
                 ]
               },
               "multiselect": true,
               "requiredField": true
             },
-            { "fieldLabel": "Notes", "requiredField": true }
+            {
+              "fieldLabel": "Notes",
+              "requiredField": true
+            }
           ]
         },
         "options": {}
       },
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.2,
-      "position": [120, 0],
-      "id": "v2-form",
-      "name": "On form submission"
+      "position": [
+        -576,
+        -320
+      ],
+      "id": "413d8bb9-8239-48ba-8a22-abdde878e696",
+      "name": "On form submission",
+      "webhookId": "50f7af7b-1a15-4a45-8b93-0ce6cea19a5b"
     },
     {
       "parameters": {
-        "jsCode": "const input = $json;\n\nreturn [{\n  topic: input.Topic,\n  tone: Array.isArray(input.Tone) ? input.Tone.join(\", \") : input.Tone,\n  audience: Array.isArray(input.Audience) ? input.Audience.join(\", \") : input.Audience,\n  notes: input.Notes,\n  staticKeywords: [\"Recording Studio\", \"Austin\", \"Mixing & Mastering\", \"Music Production\"],\n  backlinkUrl: \"https://www.BlakMarigold.com\",\n  maxWords: 1000\n}];"
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [340, 0],
-      "id": "v2-normalize",
-      "name": "Normalize Inputs"
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -992,
+        -16
+      ],
+      "id": "5b7d43a6-c0d6-4e44-b966-fd856f5579c4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "X4Hj4SQCqufFkb5z",
+          "name": "OpenAi account 2"
+        }
+      }
     },
     {
       "parameters": {
-        "query": "={{ $json.topic }}",
+        "query": "={{ $('On form submission').item.json.Topic }}",
         "options": {}
       },
       "type": "@tavily/n8n-nodes-tavily.tavilyTool",
       "typeVersion": 1,
-      "position": [560, -120],
-      "id": "v2-tavily",
-      "name": "Research Tavily"
+      "position": [
+        -368,
+        -32
+      ],
+      "id": "96383504-6b44-405f-829b-b209bd883e90",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "KW2MxivzmFG603sv",
+          "name": "Tavily account"
+        }
+      }
     },
     {
       "parameters": {
-        "model": "sonar",
-        "messages": {
-          "message": [
-            {
-              "content": "=You are a research assistant. Search the web and return a structured research report.\nInclude 5 to 7 sources.\nReturn JSON only in this exact structure:\n{\n  \"summary\": \"...\",\n  \"key_points\": [\"...\"],\n  \"sources\": [{\"title\":\"...\",\"url\":\"...\",\"publisher\":\"...\"}]\n}\n",
-              "role": "system"
-            },
-            { "content": "={{ \"Research topic: \" + $json.topic + \". Notes: \" + $json.notes }}" }
-          ]
-        },
-        "options": {},
-        "requestOptions": {}
+        "promptType": "define",
+        "text": "=Blog Topic:  {{ $('On form submission').item.json.Topic }}\nBlog Tone: {{ $('On form submission').item.json.Tone }}\nBlog Target Audience: {{ $('On form submission').item.json.Audience }}\nBlog Notes:{{ $('On form submission').item.json.Notes }}\n\nThe opening section should vary its approach.\nRotate between:\n- A short scenario\n- A blunt statement\n- A quiet realization\n- A mistake artists often admit later\nDo not always start with Imagine you are.\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## Overview\nYou are an AI agent responsible for planning the sections of a blog by creating an engaging table of contents tailored to the blog’s topic, tone, and target audience.\n\n## Context\n- The blog will vary in topic, tone, and target audience depending on the request.\n- Your role is to use the “Tavily” and “Perplexity” tools to search for relevant topics and craft a high-level, engaging table of contents.\n- The table of contents should flow like a story: each section should build naturally into the next, rather than feeling like an information dump.\n- The first section should begin with a short story, scenario, or question that connects emotionally with the target audience and explains why the blog matters to them.\n\n## Instructions\n1. Analyze the incoming information, including the blog topic, tone, and target audience details.\n2. Use the “Tavily” and “Perplexity” tools to research relevant and trending subtopics related to the main blog topic.\n3. Based on your findings, create a table of contents with 4–6 high-level, engaging sections tailored to the target audience.\n4. Ensure the topics align with the blog’s tone and are structured to maintain the reader’s interest, with smooth transitions between sections.\n5. The first section must act as a hook: begin with a short story, scenario, or rhetorical question.\n6. Include brief descriptions for each section if requested.\n\n## Google Analytics Context\n- If `seoSignals` data is provided, use it only as background context to improve blog planning.\n- Do not output `seoSignals` data directly in the blog. Use it only to refine focus and topic selection.\n- Look at top-performing keywords, search terms, or user behavior patterns (pages, cities, session duration).\n- Use this to refine SEO focus and topic suggestions subtly.\n- Do not output analytics stats directly in the blog.\n\n\n\n## Tools\n- Tavily tool for internet research\n- Perplexity tool for structured insights\n- Predefined audience profiles (if provided)\n\n## Examples\n**Input:**\n- Topic: “Music Production Tips”\n- Tone: Sarcastic yet insightful\n- Target Audience: Independent artists and producers who think watching one YouTube tutorial makes them an engineer\n\n**Output:**\nTable of Contents:\n1. “So You Think Your Closet Sounds Like Abbey Road?”  \n   *A short story about every indie artist who thinks a $50 mic and blankets make them a pro studio.*\n2. “Mixing Mistakes You’ll Keep Making Anyway (Until You Don’t)”\n3. “Mastering Explained: Why Your Track Still Sounds Like a Demo”\n\n**Input:**\n- Topic: “Getting Started with Sync Licensing”\n- Tone: Professional yet approachable\n- Target Audience: Local artists interested in expanding their music careers through film, TV, and commercial placements\n\n**Output:**\nTable of Contents:\n1. “Imagine Hearing Your Song in a Netflix Scene”  \n   *A scenario hook about an artist hearing their song on TV for the first time.*\n2. “What Is Sync Licensing and Why It Matters for Local Artists”\n3. “Building a Sync-Ready Catalog: Quality Over Quantity”\n4. “Metadata, Splits, and Contracts: The Unsexy Stuff That Pays”\n5. “How to Pitch Your Music Without Burning Bridges”\n\n## SOP\n1. Review the provided details about the blog’s topic, tone, and target audience.\n2. Use Tavily + Perplexity to find trending, relevant, and engaging subtopics.\n3. Brainstorm 4–6 high-level topics that flow naturally and appeal to the target audience.\n4. Ensure the first section starts with a short story, scenario, or question.\n5. Verify that each section aligns with the tone and goals of the blog.\n6. Provide smooth transitions between sections.\n\n## Final Notes\n- Think like a storyteller, not a list generator.\n- Adapt tone and flow to the audience profile.\n- Balance SEO relevance with human readability and narrative flow.\n"
+        }
       },
-      "type": "n8n-nodes-base.perplexityTool",
-      "typeVersion": 1,
-      "position": [560, 120],
-      "id": "v2-perplexity",
-      "name": "Research Perplexity"
-    },
-    {
-      "parameters": {
-        "jsCode": "const tavily = $items(\"Research Tavily\")[0]?.json;\nconst pplx = $items(\"Research Perplexity\")[0]?.json;\n\nreturn [{\n  researchPack: {\n    tavily,\n    perplexity: pplx,\n    generatedAt: new Date().toISOString()\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [780, 0],
-      "id": "v2-pack",
-      "name": "Build Research Pack"
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        -320
+      ],
+      "id": "7732dccf-8209-4ec7-a0fe-0a94abb252ba",
+      "name": "Blog Agent"
     },
     {
       "parameters": {
@@ -114,8 +159,8 @@
         "messages": {
           "values": [
             {
-              "content": "=You are an SEO research assistant.\nUse ONLY the researchPack provided. Do not invent keywords.\nRules:\n1. Primary keywords must be 5 to 6 word high value phrases.\n2. Secondary keywords are supporting phrases max 9 words.\n3. All lowercase.\n4. No punctuation.\n5. No duplicates between lists.\nReturn JSON only:\n{\n  \"primary_keywords\": [\"...\"],\n  \"secondary_keywords\": [\"...\"]\n}\n\nContext:\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nNotes: {{ $items(\"Normalize Inputs\")[0].json.notes }}\nResearch Pack: {{ JSON.stringify($json.researchPack) }}\n",
-              "role": "system"
+              "content": "=Your job is to split out the table of contents into an individual item for each section of a blog. Output each section separately in a field called \"blogSections\". When a single blog title is provided instead of a table of contents, generate a complete blog outline from beginning to end using titles only, then convert that outline into blogSections.\n\nBlog target audience is {{ $('On form submission').item.json.Audience }} and the tone of the blog should be {{ $('On form submission').item.json.Tone }}.\n\nHere is the table of contents: {{ $('Blog Agent').item.json.output }}\n\nIMPORTANT:\n\nReturn ONLY valid JSON.\nDo not include dashes(—) in the titles nor description.\n\nDo NOT return markdown, bullet points, or explanations.\n\nDo NOT wrap the JSON in backticks or quotes.\n\nThe response must be a valid JSON object.\n\nThe JSON should follow this structure exactly:\n\n{\n\"blogSections\": [\n{\n\"title\": \"Section Title 1\",\n\"description\": \"One-sentence description of section 1\"\n},\n{\n\"title\": \"Section Title 2\",\n\"description\": \"One-sentence description of section 2\"\n},\n{\n\"title\": \"Section Title 3\",\n\"description\": \"One-sentence description of section 3\"\n}\n]\n}",
+              "role": "=system"
             }
           ]
         },
@@ -124,133 +169,91 @@
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [1000, 0],
-      "id": "v2-keywords",
-      "name": "Keyword Extractor v2"
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "GPT-4O-MINI"
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=Create a blog outline as strict JSON.\nConstraints:\n1. 4 to 6 sections.\n2. Each section must have sectionIndex starting at 1.\n3. No dashes in titles or descriptions.\n4. Titles must be clear and clickable.\nReturn JSON only:\n{\n  \"blogSections\": [\n    {\"sectionIndex\":1,\"title\":\"...\",\"description\":\"...\"}\n  ]\n}\n\nInputs:\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nTone: {{ $items(\"Normalize Inputs\")[0].json.tone }}\nAudience: {{ $items(\"Normalize Inputs\")[0].json.audience }}\nNotes: {{ $items(\"Normalize Inputs\")[0].json.notes }}\nResearch Pack: {{ JSON.stringify($items(\"Build Research Pack\")[0].json.researchPack) }}\n\nAlso ensure the first section is a hook that starts with a short scenario or question.\n",
-              "role": "system"
-            }
-          ]
-        },
-        "jsonOutput": true,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
-      "position": [1220, 0],
-      "id": "v2-outline",
-      "name": "Outline Planner v2"
+      "position": [
+        48,
+        -48
+      ],
+      "id": "46be8188-adb8-401a-b901-12d3b3c2a31f",
+      "name": "Project Planner1",
+      "credentials": {
+        "openAiApi": {
+          "id": "X4Hj4SQCqufFkb5z",
+          "name": "OpenAi account 2"
+        }
+      }
     },
     {
       "parameters": {
         "fieldToSplitOut": "message.content.blogSections",
-        "include": "noOtherFields",
+        "include": "=noOtherFields",
         "options": {}
       },
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
-      "position": [1440, 0],
-      "id": "v2-split",
-      "name": "Split Sections"
+      "position": [
+        384,
+        -48
+      ],
+      "id": "93e698a9-7769-4ae1-8191-e0a1e2925591",
+      "name": "Split Out"
     },
     {
       "parameters": {
-        "promptType": "define",
-        "text": "=Write the final content for this section only.\n\nSection Index: {{ $json.sectionIndex }}\nSection Title: {{ $json.title }}\nSection Description: {{ $json.description }}\n\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nTone: {{ $items(\"Normalize Inputs\")[0].json.tone }}\nAudience: {{ $items(\"Normalize Inputs\")[0].json.audience }}\nNotes: {{ $items(\"Normalize Inputs\")[0].json.notes }}\n\nResearch Pack: {{ JSON.stringify($items(\"Build Research Pack\")[0].json.researchPack) }}\n\nRules:\n1. Output HTML only.\n2. Include at least 2 inline citations as HTML links using URLs from the research pack.\n3. Do not add a Sources section here.\n4. No dashes.\n",
+        "mode": "combine",
+        "combineBy": "combineByPosition",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.2,
-      "position": [1660, 0],
-      "id": "v2-section-writer",
-      "name": "Section Writer"
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        -48
+      ],
+      "id": "194ac1f7-9bb4-4f98-9566-bdfbaaf58fbc",
+      "name": "Merge"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst sections = items.map(i => {\n  const j = i.json;\n  return {\n    sectionIndex: j.sectionIndex,\n    title: j.title,\n    description: j.description,\n    html: j.output || j.text || j.content || j\n  };\n});\n\nsections.sort((a,b) => (a.sectionIndex||0) - (b.sectionIndex||0));\n\nreturn [{ sections }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1880, 0],
-      "id": "v2-collect",
-      "name": "Collect And Sort"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=You are an expert editor. Build a single HTML blog from the sections.\n\nRequirements:\n1. Start with a 3 to 5 sentence scenario hook that clearly states who this blog is for.\n2. Then include each section as an H2 followed by its HTML content.\n3. Preserve all inline citations already present.\n4. Add ONE Sources section at the end as:\n<h2>Sources</h2>\n<ul>\n<li><a href=\"url\">publisher title</a></li>\n</ul>\nOnly use URLs that appear in the inline citations or research pack.\n5. No dashes.\n6. Max words: {{ $items(\"Normalize Inputs\")[0].json.maxWords }}\n\nStatic keywords must appear exactly once each:\n{{ $items(\"Normalize Inputs\")[0].json.staticKeywords.join(\", \") }}\n\nDynamic keywords:\nPrimary: {{ $items(\"Keyword Extractor v2\")[0].json.message.content.primary_keywords }}\nSecondary: {{ $items(\"Keyword Extractor v2\")[0].json.message.content.secondary_keywords }}\n\nBacklink rules:\nInsert a backlink to {{ $items(\"Normalize Inputs\")[0].json.backlinkUrl }} at least once in the body.\nAdd one short closing line with another backlink at the end.\n\nInputs:\nTopic: {{ $items(\"Normalize Inputs\")[0].json.topic }}\nTone: {{ $items(\"Normalize Inputs\")[0].json.tone }}\nAudience: {{ $items(\"Normalize Inputs\")[0].json.audience }}\nSections JSON: {{ JSON.stringify($json.sections) }}\nResearch Pack: {{ JSON.stringify($items(\"Build Research Pack\")[0].json.researchPack) }}\n",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.2,
-      "position": [2100, 0],
-      "id": "v2-final-editor",
-      "name": "Final Editor"
-    },
-    {
-      "parameters": {
-        "jsCode": "const html = $json.output || \"\";\nconst text = html.replace(/<[^>]*>/g, \" \").replace(/\\s+/g, \" \").trim();\nconst words = text ? text.split(\" \").length : 0;\nconst hasSources = /<h2>\\s*Sources\\s*<\\/h2>/i.test(html);\nconst hasBacklink = /https:\\/\\/www\\.BlakMarigold\\.com/i.test(html);\nconst linkCount = (html.match(/<a\\s+href=/gi) || []).length;\n\nreturn [{\n  wordCount: words,\n  hasSources,\n  hasBacklink,\n  linkCount,\n  html\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [2320, 0],
-      "id": "v2-qc",
-      "name": "Quality Check"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "boolean": [
-            { "value1": "={{ $json.hasSources }}", "value2": true },
-            { "value1": "={{ $json.hasBacklink }}", "value2": true }
-          ],
-          "number": [
-            { "value1": "={{ $json.wordCount }}", "operation": "smallerEqual", "value2": 1000 },
-            { "value1": "={{ $json.linkCount }}", "operation": "largerEqual", "value2": 6 }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [2540, 0],
-      "id": "v2-if",
-      "name": "Pass Quality Gate"
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "GPT-4O-MINI"
-        },
-        "messages": {
-          "values": [
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
             {
-              "content": "=Fix this HTML to pass the quality gate.\nRules:\n1. Preserve all existing citations.\n2. Ensure Sources section exists and includes all cited URLs.\n3. Ensure at least 6 inline links total.\n4. Ensure at least one backlink to https://www.BlakMarigold.com in the body and one in the closing line.\n5. Ensure word count is 1000 or less.\n6. No dashes.\nReturn HTML only.\n\nHTML:\n{{ $json.html }}\n",
-              "role": "system"
+              "fieldToAggregate": "title"
+            },
+            {
+              "fieldToAggregate": "output"
             }
           ]
         },
-        "options": {}
+        "options": {
+          "mergeLists": false
+        }
       },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
-      "position": [2760, 140],
-      "id": "v2-fixer",
-      "name": "Auto Fixer"
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -16
+      ],
+      "id": "7d2bc5ec-0888-421a-8155-442bb67f0b05",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert editor formatting a professional blog for online publication for Blak Marigold Studio.\n\nYour role is to transform the provided content into a clean, readable, high quality blog that feels human, intentional, and trustworthy.\n\nCRITICAL CITATION RULES:\n\n1. DO NOT include external links or citations inside paragraphs.\n2. DO NOT place source links inline within the body text.\n3. You MAY reference sources conceptually without linking.\n4. ALL external citations MUST appear only in a single Sources section at the bottom of the article.\n5. Each external source must appear ONLY ONCE.\n6. If a paragraph reads clearly without a source, do not force one.\n\nINTERNAL LINK RULES (MANDATORY):\n\nYou MUST include exactly ONE link to EACH of the following internal pages in every blog:\n\n1. https://www.BlakMarigold.com\n2. https://www.blakmarigold.com/recording-studio\n3. https://www.blakmarigold.com/mixing-and-mastering\n4. https://www.blakmarigold.com/photography\n5. https://www.blakmarigold.com/sync\n6. https://www.blakmarigold.com/discord\n7. https://www.blakmarigold.com/playlist-submission\n\nPLACEMENT RULES:\n\n- Distribute the links naturally across the article.\n- Do NOT place links back to back.\n- Do NOT cluster links in a single section.\n- Do NOT place more than one internal link in the same paragraph.\n- Each link should appear where it contextually makes sense.\n- Earlier sections should favor studio and recording related links.\n- Mid article sections may include mixing mastering or photography links.\n- Later sections may include sync discord or playlist submission links.\n- Include one short standalone sentence somewhere mid article.\nNo link. No explanation. (Example: Most artists realize this too late.)\n\n\nANCHOR TEXT RULES:\n\n- Use natural intent driven anchor text.\n- Do NOT repeat the same anchor text across blogs.\n- Do NOT label links generically like click here or learn more.\n- The link should feel like part of the sentence not a CTA block.\n\n\nCONTENT STYLE RULES:\n- Avoid absolute claims.\nUse soft qualifiers like often, usually, many artists, in most cases.\n- Vary transitions. Some paragraphs may start abruptly.\n- Improve flow and readability\n- Short to medium length paragraphs\n- Natural conversational tone\n- No academic language\n- No buzzwords\n- No dashes\n- No emojis\n- No marketing hype\n\nFORMAT REQUIREMENTS:\n\n- Output HTML only\n- Do NOT output a title\n- Do NOT output an introduction\n- Start with the first section heading\n- Use proper paragraph spacing\n- End with the Sources section\n\nSOURCES SECTION RULES:\n\n- Include a single Sources section at the very bottom\n- List all external references used\n- Alphabetize by publication name\n- Use this format exactly:\n\n<ul>\n  <li><a href=\"URL\">Publication Name Article Title</a></li>\n</ul>\n\nIMPORTANT CONSTRAINTS:\n\n- Preserve factual accuracy\n- Do not fabricate sources\n- Do not invent statistics\n- Max 1500 words total or the automation breaks\n\nToday's date is {{ $now }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## Overview\nYou are an expert editor specializing in creating and refining content to output a high quality, formatted blog. You are given a list of titles and outputs and you will use these to create a blog tailored towards the defined target audience. Create a section in the blog for each title, with a hyperlinked source in each section based on the content.\n\n## Objective\n1. Create content for each title using the provided content\n2. Each section should contain inline citations *Don’t leave any out*\n3. Improve the flow of the blog and format it for readability\n\n## Readability & Tone\n1. The content must be digestible and easy to follow.  \n2. Avoid academic or overly complex vocabulary—no big words.  \n3. Use a natural, relatable style for readers between 18–30.  \n\n\n## Citation Management\n1. Preserve all inline citations\n2. Standardize citation format\n3. Ensure citations don’t disrupt the flow of reading\n\n## Source Section\n1. Create ONE \"Sources\" section at the end of the blog\n2. Format each source entry consistently:\n   <li><a href=\"[URL]\">[Publication Name] – [Article Title]</a></li>\n3. Include a complete URL for each source\n4. Organize all sources alphabetically\n5. Verify all links are functional\n\n## Output Format\nThe blog should be structured as html that will be published online:\n- Do not output a title or an introduction; the output should start with the first article heading\n- Main content with hyperlink citations in each section\n- Headers for each section of the blog\n- Sources section at the end with all links\n\n## Formatting & SEO Requirements\n### Static Keywords\nThese must appear 1 time each:\n- \"Recording Studio\"\n- \"Austin\"\n- \"Mixing & Mastering\"\n- \"Music Production\"\n\n### Dynamic Keywords\nIntegrate these naturally from Tavily research:\n- Primary: {{ $('Keyword Extractor').item.json.message.content.primary_keywords }}\n- Secondary: {{ $('Keyword Extractor').item.json.message.content.secondary_keywords }}\n\n### Rules\n- Keywords should flow naturally and not appear stuffed.\n- No Dashes\n- Insert a backlink to https://www.BlakMarigold.com at least once within the body of the blog.  \n   Example: “Our recording studio in Austin specializes in mixing & mastering services. Learn more at [Blak Marigold Studio](https://www.BlakMarigold.com).”  \n   The link text should vary slightly each time (Recording Studio in Austin, Blak Marigold Studio, Mixing & Mastering Services, etc.) to avoid repetition.  \n- At the end of the article, add a short closing line with another backlink.  \n   Example: “For more info, visit [Blak Marigold Studio](https://www.BlakMarigold.com).”\n\n## Important\nOutput 1000 words maximum or else the automation breaks!\n\nToday's date is {{ $now }}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        240
+      ],
+      "id": "3121d1dc-de8f-4146-b85d-a6cfef4090b8",
+      "name": "Editor"
     },
     {
       "parameters": {
@@ -263,7 +266,7 @@
         "messages": {
           "values": [
             {
-              "content": "=Create a title for this blog. Tone: {{ $items(\"Normalize Inputs\")[0].json.tone }}. Audience: {{ $items(\"Normalize Inputs\")[0].json.audience }}.\nRules:\n1. Plain text only.\n2. Capitalize First Letter In Each Word.\n3. Every title is a sarcastic question.\nNo dashes.\n\nBlog HTML:\n{{ $json.html || $json.message.content }}\n",
+              "content": "=You are a professional SEO copywriter generating blog titles for a music recording studio.\n\nYour job is to produce ONE extremely click worthy blog title.\n\nCRITICAL DECISION RULE (READ CAREFULLY):\n\nStep 1:\nDetermine whether AI is the PRIMARY topic of the blog.\n\nAI is considered PRIMARY ONLY IF:\n- The Topic field explicitly mentions AI\n- OR the Notes field explicitly mentions AI\n- OR more than 50 percent of the blog content is about AI\n\nIf AI is NOT PRIMARY:\n- You are STRICTLY FORBIDDEN from mentioning AI in the title\n- Even if AI appears in the article body\n- Even if AI is emotionally framed\n- Even if AI appears early in the article\n\nIf AI IS PRIMARY:\n- You MAY include AI in the title\n\nStep 2:\nCreate the title based ONLY on the primary topic.\n\nTITLE RULES:\n- Focus on recording studio experience, music production, beats, royalties, or artist mistakes\n- Prioritize human decisions, consequences, and curiosity\n- Sound like something a real artist would click\n- Do NOT summarize the blog\n- Do NOT reference technology trends unless primary\n\nALLOWED TITLE FORMATS:\n- What Nobody Tells You About\n- Why Most Artists\n- The Real Reason\n- Are You Actually Ready For\n- How Artists Lose Money Without Realizing It\n\nFORMAT REQUIREMENTS:\n- Output ONE title only\n- Plain text\n- No dashes\n- No quotation marks\n- Capitalize The First Letter Of Each Word\n- Keep under 65 characters when possible\n\nINPUT CONTEXT:\nTopic: {{ $('On form submission').item.json.Topic }}\nNotes: {{ $('On form submission').item.json.Notes }}\nTone: {{ $('On form submission').item.json.Tone }}\nAudience: {{ $('On form submission').item.json.Audience }}\n\nBLOG CONTENT:\n{{ $json.output }}\n",
               "role": "system"
             }
           ]
@@ -272,81 +275,469 @@
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [2980, 0],
-      "id": "v2-title",
-      "name": "Create Title v2"
+      "position": [
+        -48,
+        240
+      ],
+      "id": "fb3b705f-3a70-40bb-8c09-ca9aa962e0ee",
+      "name": "Create Title",
+      "credentials": {
+        "openAiApi": {
+          "id": "X4Hj4SQCqufFkb5z",
+          "name": "OpenAi account 2"
+        }
+      }
     },
     {
       "parameters": {
-        "sendTo": "example@company.com",
-        "subject": "={{ $items(\"Create Title v2\")[0].json.message.content || $items(\"Create Title v2\")[0].json.output }}",
-        "message": "={{ $json.html || $json.message.content || $json.output }}",
-        "options": { "senderName": "Blog Approval" }
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an SEO research assistant.\n\nYou must specifically use Perplexity and Tavily search results as your only data source.  \nDo not invent or guess keywords — only extract from the Tavily results provided below.\n\n### Rules:\n1. Focus only on terms relevant to {{ $json.output }}.\n2. primary_keywords → 5–6 word, high-value core terms.\n3. Always refer to the Notes:  {{ $('On form submission').item.json.Notes }} section; it holds the context and ideas that should influence the blog's content.\n3. secondary_keywords → supporting phrases (max 9 words).\n4. All keywords must be lowercase. Remove punctuation, symbols, or brand names.\n5. Exclude extremely generic terms (like \"music\", \"sound\") unless paired with context.\n6. Do not duplicate terms between lists.\n7. Always return JSON only. If no keywords are found, return:\n   {\"primary_keywords\": [], \"secondary_keywords\": []}\n\n### Output Format:\n{\n  \"primary_keywords\": [\"...\"],\n  \"secondary_keywords\": [\"...\"]\n}\n\n### Data Source (Perplexity and Tavily Search Results):\n{{ $json.output }}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        112,
+        -320
+      ],
+      "id": "23665594-50e7-4338-9759-38592df953fd",
+      "name": "Keyword Extractor",
+      "credentials": {
+        "openAiApi": {
+          "id": "X4Hj4SQCqufFkb5z",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Research",
+        "height": 192,
+        "width": 592
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "6a65a31a-8d73-451f-a6eb-95678a60a36b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## OpenAI\n",
+        "height": 192,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "c28a6676-a095-41ff-aae8-a74317b5cd74",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "=You are a research assistant. Search the web and return a structured research report. \nAlways include 3–5 sources. \nFormat response as JSON: \n{\n  \"summary\": \"...\",\n  \"key_points\": [\"...\", \"...\"],\n  \"sources\": [\"url1\", \"url2\", \"url3\"]\n}\n",
+              "role": "system"
+            },
+            {
+              "content": "=Conduct deep research "
+            }
+          ]
+        },
+        "simplify": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify_Output', ``, 'boolean') }}",
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        -32
+      ],
+      "id": "b65aa18e-9a77-4d86-88f0-32b31f14beb3",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "HNIdLnAsTIn7ytFF",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        240
+      ],
+      "id": "beb8d595-0e96-4781-a3ab-7b6cbd11d475",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "gpt-5.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -816,
+        -16
+      ],
+      "id": "05300a56-3011-4008-aaf6-0ffffe6719e7",
+      "name": "OpenAI Chat Model1 5.1",
+      "credentials": {
+        "openAiApi": {
+          "id": "X4Hj4SQCqufFkb5z",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -32
+      ],
+      "id": "38932666-9a27-4e4e-8fca-d649875aa4a7",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "4HUaDUjHImC2yTk4",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Section Description:{{ $('Project Planner1').item.json.message.content.blogSections }}\n\nBlog Target Audience: {{ $('On form submission').item.json.Audience }}\n\nBlog Tone: {{ $(\"On form submission\").item.json.Tone }}\n\n## Overview\nYou are an AI agent responsible for delivering only the final content for a blog section. Your role is to produce concise, well-researched, and audience-tailored content based solely on the provided inputs, with no prefacing statements or explanations.\n\n## Context\n- All necessary details, including the section title, description, target audience, and tone, will be provided.\n- The goal is to create engaging content that aligns with the audience's expectations and the blog’s objectives.\n- Content must be supported by research, with sources clearly cited using hyperlinks.\n- Some sections should end without resolution.\nLeave the thought slightly open.\n\n\n## Content Rules\n- Write like someone who has been in real studio sessions, not like a journalist.\n- Prefer practical observations over explanations.\n- Section length should vary.\nSome sections may be shorter if the point is clear.\n- Occasionally acknowledge uncertainty or tradeoffs without resolving them.\n- Include at least one concrete, mundane detail from studio life when relevant.\n\n \n\n## Instructions\n1. Write the final content without including any introductory or concluding remarks about the writing process.\n2. Conduct research using perplexity and the tavily tool to ensure credibility and relevance.\n3. Use the provided inputs to craft a focused section tailored to the target audience.\n4. Provide source URLs separately at the end of your response.\nDo NOT place links inside paragraphs.\n\n\n## SOP (Standard Operating Procedure)\n1. **Input Analysis**: Understand the section’s title, description, target audience, and tone.\n2. **Research**: Use perplexity and the tavily tool to gather relevant, credible information.\n3. **Content Writing**: Craft a section based on the provided inputs, ensuring it is directly usable in the blog.\n4. **Cite Sources**: Integrate hyperlinks to all references within the content.\n5. **Review and Deliver**: Proofread the content to ensure clarity, accuracy, and alignment with the target audience.\n\n## Citation Guidelines\n- Use perplexity and the tavily tool to gather information and cite sources.\n- For each major claim or piece of information, include a hyperlinked inline citation.\n- Format citations as HTML links with descriptive text:\n  <a href=\"[URL]\">[Source: Publication Name]</a>\n- When directly quoting from a source, use quotation marks and include the citation.\n\n## Tools\n- Tavily (for research and citations)\n- Perplexity (for deep research and citations)\n- Serps (for google search results page)\n\n## Examples\n**Input:**\n- Section Title: \"The Psychology of Happy Listeners\"\n- Description: Discuss strategies independent artists can use to improve fan engagement and satisfaction, such as personalized content and stress-reducing production techniques.\n- Target Audience: Local artists and producers.\n- Tone: Informative yet approachable.\n\n**Output:**\n\"Creating a positive listener experience starts with understanding the key drivers of satisfaction in music. Personalized content, such as addressing individual fan preferences and tailoring releases, can significantly boost trust and loyalty [Source](https://example.com/personalized-content). Stress-reducing techniques, like simplifying release strategies or offering exclusive previews, have been shown to alleviate fan fatigue and improve overall impressions of an artist’s brand [Source](https://example.com/fan-engagement). By focusing on these elements, artists can foster happier, more loyal listeners.\"\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -320
+      ],
+      "id": "9c18f1e0-fd10-4743-b4c0-f5217bf19a54",
+      "name": "Research Team"
+    },
+    {
+      "parameters": {
+        "sendTo": "smmamun971@gmail.com",
+        "subject": "={{ $('Create Title').item.json.message.content }}",
+        "message": "={{ $('Editor').item.json.output }}\n\n",
+        "options": {
+          "senderName": "Blog Approval"
+        }
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [3200, 0],
-      "id": "v2-email",
-      "name": "Email Blog v2"
+      "position": [
+        416,
+        448
+      ],
+      "id": "7de96fb4-35aa-4401-9e02-bc92008da80c",
+      "name": "Virtual Assistant 1 Email",
+      "webhookId": "a331f52a-172e-4b81-b007-d3c7fb4630cc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tUVLx7WUJp91UL17",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "blakmarigold@gmail.com",
+        "subject": "={{ $('Create Title').item.json.message.content }}",
+        "message": "={{ $('Editor').item.json.output }}\n\n",
+        "options": {
+          "senderName": "Blog Approval"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        240
+      ],
+      "id": "041b6d15-8aae-4c93-9c20-6934df5cd212",
+      "name": "Studio Email",
+      "webhookId": "a331f52a-172e-4b81-b007-d3c7fb4630cc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tUVLx7WUJp91UL17",
+          "name": "Gmail account"
+        }
+      }
     }
   ],
+  "pinData": {
+    "Split Out1": [
+      {
+        "json": {
+          "output": "```html\n<h2>Why Your Last Album Flopped</h2>\n<p>Imagine you’re a recording artist who poured heart and soul into your latest album, only to see it barely catch any buzz. One main reason albums flop is a disconnect between the music and what your audience wants. Sometimes, artists get caught up chasing trends or letting AI tools create beats that don’t have that human touch—especially dangerous now, considering the risks of using AI in music that may not even be copyrightable. Without authentic, original, and protectable beats crafted with your creative input, your music might fail to stand out and connect, losing potential income and fans.</p>\n<p>It's crucial to remember that music production involves more than sound—it’s storytelling through your unique voice. A good recording studio, like those in Austin, can help you polish your art with mixing & mastering services that bring your vision to life instead of sounding generic or AI-generated. The myth that AI-generated beats can save time and money without consequences is busted by the fact that fully AI-created music might not qualify for copyright protection. This can cut your path to sync licensing opportunities and hurt your creative control in the long run.</p>\n\n<h2>The Art of Overthinking Lyrics</h2>\n<p>Overthinking lyrics is something many recording artists experience, especially when mixing personal emotions with technical songwriting. But sometimes, aiming for perfection or getting caught up in “selling out” fears can drain your creative spark. The challenge doubles when AI is involved—you want to keep your lyrics and beats original and human-authored to maintain copyright protections. Remember, copyright law only protects works with human creative input, so over-relying on AI risks making your music unprotected, leaving you vulnerable.</p>\n<p>Don’t let creative control slip away by giving AI too much power over your music. Instead, use AI as a tool to inspire, but always add your personal touch to lyrics and beats. This keeps your music authentic, original, and safeguardable. Learning to trust your instincts over perfecting every word can lead to stronger songs and a clearer artistic voice.</p>\n\n<h2>Marketing 101 for Musicians</h2>\n<p>In today’s music world, making great beats isn’t enough—you need strong marketing to get noticed. Whether you’re releasing solo tracks or collaborations, promotional strategy matters. Sync licensing opportunities from TV, films, and ads can be a great revenue source, but they usually require you to own the rights to your music. That means beats created solely by AI won’t cut it because they lack copyright protection.</p>\n<p>Focus on creating original, protectable beats by blending your creativity with AI tools, rather than handing over full control. Then leverage social media and music platforms to share your work authentically. And if you want professional polish, a recording studio in Austin with mixing & mastering expertise can amplify your sound for better reach. The music industry is competitive, so maximize your human authorship to maintain your rights and income potential.</p>\n\n<h2>Social Media: Your New Best Friend (or Foe)</h2>\n<p>Social media can feel like a double-edged sword for musicians. On one hand, it’s your fastest way to connect with fans, share your latest tracks, and build your brand. On the other, it can distract you or overwhelm your creative process—especially if you’re chasing trends and copying AI-generated beats that flood these platforms.</p>\n<p>Remember the risks of using AI in music: if your tracks lack human authorship, they might not have copyright protection, which means anyone could remix or reuse your beats without permission. This erodes your creative control and potential royalties. Be mindful of what you post and how you craft your music to keep it original and protected. Using social media to share your genuine style and human-produced music will build a loyal audience that respects your artistry.</p>\n\n<h2>DIY Recording: When All Else Fails</h2>\n<p>Many artists start by recording at home with minimal equipment—sometimes hitting a wall when the sound isn’t quite right. DIY recording can be a great first step, but without access to professional mixing & mastering services, your music might not reach its full potential or sound “radio-ready.” Plus, automating too much of the process with AI tools can risk producing beats that don’t qualify for copyright protection, putting your ownership in jeopardy.</p>\n<p>If budget allows, seek out a local <a href=\"https://www.BlakMarigold.com\">recording studio in Austin</a> to help add polish and human expertise to your tracks. This will protect the originality of your music while helping you learn how to keep your beats human and original. Remember, you’re not alone in the music production journey—professional help ensures your sound stays crisp and your rights stay protected.</p>\n\n<h2>The Myth of 'Selling Out'</h2>\n<p>Many musicians wrestle with the fear of “selling out,” thinking collaborating with brands or experimenting with AI sounds diminishes their art. But the reality is, smart collaborations and using technology responsibly can open new creative doors and income streams like sync licensing for films and commercials. Just be cautious—if AI dominates your music too much, you lose copyright protections and exclusive control.</p>\n<p>Keeping beats human and original while embracing new ideas is the sweet spot where creativity and business meet. Don’t be afraid to mix new tech with your artistry, as long as you maintain your authorship. This balance ensures you benefit from technology like AI without losing your sound or your rights as a recording artist.</p>\n\n<h2>Collaborations: The Double-Edged Sword</h2>\n<p>Collaborations with other musicians or producers bring fresh energy but can also complicate ownership and copyright issues. When AI-generated elements enter the mix without clear human authorship, it muddies who actually owns the music. Sync licensing opportunities, for example, often require clear proof of original, human-created content to avoid disputes and legal grey areas.</p>\n<p>Be transparent about who contributed what and ensure your music production process includes significant human input. When done right, collaborations expand your creative control rather than erode it. Protect your work by keeping these factors in mind and using professional mixing & mastering services in a trusted studio environment, like our <a href=\"https://www.BlakMarigold.com\">Blak Marigold Studio</a> in Austin.</p>\n\n<p>For more insights on how to protect your music and elevate your sound, visit <a href=\"https://www.BlakMarigold.com\">Blak Marigold Studio</a>.</p>\n\n<h2>Sources</h2>\n<ul>\n  <li><a href=\"https://www.bbc.com/news/articles/c8xqv9g8442o\">BBC – AI and Copyright: The Human Author Rule</a></li>\n  <li><a href=\"https://www.billboard.com/pro/ai-generated-songs-cant-copyrighted-tools-report/\">Billboard – AI-Generated Songs and Copyright Challenges</a></li>\n  <li><a href=\"https://tish.law/blog/ai-for-small-businesses-copyright-loopholes-and-legal-landmines-to-avoid/\">Tish Law – Copyright and AI: What Musicians Need to Know</a></li>\n  <li><a href=\"https://www.youtube.com/watch?v=JcCeZUL5iLs\">MixbusTV – Explaining AI in Music Copyright</a></li>\n</ul>\n```\n"
+        }
+      }
+    ]
+  },
   "connections": {
     "On form submission": {
-      "main": [[{ "node": "Normalize Inputs", "type": "main", "index": 0 }]]
-    },
-    "Normalize Inputs": {
       "main": [
         [
-          { "node": "Research Tavily", "type": "main", "index": 0 },
-          { "node": "Research Perplexity", "type": "main", "index": 0 }
+          {
+            "node": "Blog Agent",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
-    "Research Tavily": {
-      "main": [[{ "node": "Build Research Pack", "type": "main", "index": 0 }]]
-    },
-    "Research Perplexity": {
-      "main": [[{ "node": "Build Research Pack", "type": "main", "index": 0 }]]
-    },
-    "Build Research Pack": {
-      "main": [[{ "node": "Keyword Extractor v2", "type": "main", "index": 0 }]]
-    },
-    "Keyword Extractor v2": {
-      "main": [[{ "node": "Outline Planner v2", "type": "main", "index": 0 }]]
-    },
-    "Outline Planner v2": {
-      "main": [[{ "node": "Split Sections", "type": "main", "index": 0 }]]
-    },
-    "Split Sections": {
-      "main": [[{ "node": "Section Writer", "type": "main", "index": 0 }]]
-    },
-    "Section Writer": {
-      "main": [[{ "node": "Collect And Sort", "type": "main", "index": 0 }]]
-    },
-    "Collect And Sort": {
-      "main": [[{ "node": "Final Editor", "type": "main", "index": 0 }]]
-    },
-    "Final Editor": {
-      "main": [[{ "node": "Quality Check", "type": "main", "index": 0 }]]
-    },
-    "Quality Check": {
-      "main": [[{ "node": "Pass Quality Gate", "type": "main", "index": 0 }]]
-    },
-    "Pass Quality Gate": {
-      "main": [
-        [{ "node": "Create Title v2", "type": "main", "index": 0 }],
-        [{ "node": "Auto Fixer", "type": "main", "index": 0 }]
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Blog Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Auto Fixer": {
-      "main": [[{ "node": "Create Title v2", "type": "main", "index": 0 }]]
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Blog Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Research Team",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Keyword Extractor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Create Title v2": {
-      "main": [[{ "node": "Email Blog v2", "type": "main", "index": 0 }]]
+    "Blog Agent": {
+      "main": [
+        [
+          {
+            "node": "Keyword Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Planner1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Research Team",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Editor": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Title": {
+      "main": [
+        [
+          {
+            "node": "Studio Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Virtual Assistant 1 Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Extractor": {
+      "main": [
+        [
+          {
+            "node": "Project Planner1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Team",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Keyword Extractor",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Blog Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Create Title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1 5.1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Editor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Research Team",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Team",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Team": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
-  "settings": { "executionOrder": "v1" },
-  "versionId": "v2",
-  "meta": { "templateCredsSetupCompleted": false }
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ccf4059c-1965-4683-8698-fc9a4d632266",
+  "meta": {
+    "instanceId": "3238db842a9a82014a68f881a5dfc47a12935754270597b4f29f383275e08e78"
+  },
+  "id": "mNuABXk5CtCQhaeH",
+  "tags": []
 }
