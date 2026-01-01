@@ -10,8 +10,8 @@ Super Blog Automation is a **cloud-native automation workflow** built with **n8n
 It orchestrates **LLM-based content generation**, **external research APIs**, and **automated delivery** into a single, repeatable system designed to replace manual content production workflows.
 
 This project demonstrates how to design **event-driven automation pipelines** that prioritize reliability, security, and business outcomes.
+<img width="2808" height="1197" alt="Super Blogger Automation Image" src="https://github.com/user-attachments/assets/ece50cfa-3278-4fce-ba62-84e7849981f3" />
 
-![n8n Super Blog Automation](n8n%20Super%20Blog%20Automation%20-%20n8n.png)
 ---
 
 ## Why Super Blog Automation
