@@ -83,8 +83,7 @@
         -320
       ],
       "id": "413d8bb9-8239-48ba-8a22-abdde878e696",
-      "name": "On form submission",
-      "webhookId": "50f7af7b-1a15-4a45-8b93-0ce6cea19a5b"
+      "name": "On form submission"
     },
     {
       "parameters": {
@@ -102,13 +101,7 @@
         -16
       ],
       "id": "5b7d43a6-c0d6-4e44-b966-fd856f5579c4",
-      "name": "OpenAI Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "X4Hj4SQCqufFkb5z",
-          "name": "OpenAi account 2"
-        }
-      }
+      "name": "OpenAI Chat Model"
     },
     {
       "parameters": {
@@ -122,13 +115,7 @@
         -32
       ],
       "id": "96383504-6b44-405f-829b-b209bd883e90",
-      "name": "Search in Tavily",
-      "credentials": {
-        "tavilyApi": {
-          "id": "KW2MxivzmFG603sv",
-          "name": "Tavily account"
-        }
-      }
+      "name": "Search in Tavily"
     },
     {
       "parameters": {
@@ -174,13 +161,7 @@
         -48
       ],
       "id": "46be8188-adb8-401a-b901-12d3b3c2a31f",
-      "name": "Project Planner1",
-      "credentials": {
-        "openAiApi": {
-          "id": "X4Hj4SQCqufFkb5z",
-          "name": "OpenAi account 2"
-        }
-      }
+      "name": "Project Planner1"
     },
     {
       "parameters": {
@@ -280,13 +261,7 @@
         240
       ],
       "id": "fb3b705f-3a70-40bb-8c09-ca9aa962e0ee",
-      "name": "Create Title",
-      "credentials": {
-        "openAiApi": {
-          "id": "X4Hj4SQCqufFkb5z",
-          "name": "OpenAi account 2"
-        }
-      }
+      "name": "Create Title"
     },
     {
       "parameters": {
@@ -313,13 +288,7 @@
         -320
       ],
       "id": "23665594-50e7-4338-9759-38592df953fd",
-      "name": "Keyword Extractor",
-      "credentials": {
-        "openAiApi": {
-          "id": "X4Hj4SQCqufFkb5z",
-          "name": "OpenAi account 2"
-        }
-      }
+      "name": "Keyword Extractor"
     },
     {
       "parameters": {
@@ -376,13 +345,7 @@
         -32
       ],
       "id": "b65aa18e-9a77-4d86-88f0-32b31f14beb3",
-      "name": "Message a model in Perplexity",
-      "credentials": {
-        "perplexityApi": {
-          "id": "HNIdLnAsTIn7ytFF",
-          "name": "Perplexity account"
-        }
-      }
+      "name": "Message a model in Perplexity"
     },
     {
       "parameters": {
@@ -415,13 +378,7 @@
         -16
       ],
       "id": "05300a56-3011-4008-aaf6-0ffffe6719e7",
-      "name": "OpenAI Chat Model1 5.1",
-      "credentials": {
-        "openAiApi": {
-          "id": "X4Hj4SQCqufFkb5z",
-          "name": "OpenAi account 2"
-        }
-      }
+      "name": "OpenAI Chat Model1 5.1"
     },
     {
       "parameters": {
@@ -434,13 +391,7 @@
         -32
       ],
       "id": "38932666-9a27-4e4e-8fca-d649875aa4a7",
-      "name": "SerpAPI",
-      "credentials": {
-        "serpApi": {
-          "id": "4HUaDUjHImC2yTk4",
-          "name": "SerpAPI account"
-        }
-      }
+      "name": "SerpAPI"
     },
     {
       "parameters": {
@@ -459,7 +410,7 @@
     },
     {
       "parameters": {
-        "sendTo": "smmamun971@gmail.com",
+        "sendTo": "you@example.com",
         "subject": "={{ $('Create Title').item.json.message.content }}",
         "message": "={{ $('Editor').item.json.output }}\n\n",
         "options": {
@@ -473,18 +424,11 @@
         448
       ],
       "id": "7de96fb4-35aa-4401-9e02-bc92008da80c",
-      "name": "Virtual Assistant 1 Email",
-      "webhookId": "a331f52a-172e-4b81-b007-d3c7fb4630cc",
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "tUVLx7WUJp91UL17",
-          "name": "Gmail account"
-        }
-      }
+      "name": "Virtual Assistant 1 Email"
     },
     {
       "parameters": {
-        "sendTo": "blakmarigold@gmail.com",
+        "sendTo": "you@example.com",
         "subject": "={{ $('Create Title').item.json.message.content }}",
         "message": "={{ $('Editor').item.json.output }}\n\n",
         "options": {
@@ -498,25 +442,9 @@
         240
       ],
       "id": "041b6d15-8aae-4c93-9c20-6934df5cd212",
-      "name": "Studio Email",
-      "webhookId": "a331f52a-172e-4b81-b007-d3c7fb4630cc",
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "tUVLx7WUJp91UL17",
-          "name": "Gmail account"
-        }
-      }
+      "name": "Studio Email"
     }
   ],
-  "pinData": {
-    "Split Out1": [
-      {
-        "json": {
-          "output": "```html\n<h2>Why Your Last Album Flopped</h2>\n<p>Imagine you’re a recording artist who poured heart and soul into your latest album, only to see it barely catch any buzz. One main reason albums flop is a disconnect between the music and what your audience wants. Sometimes, artists get caught up chasing trends or letting AI tools create beats that don’t have that human touch—especially dangerous now, considering the risks of using AI in music that may not even be copyrightable. Without authentic, original, and protectable beats crafted with your creative input, your music might fail to stand out and connect, losing potential income and fans.</p>\n<p>It's crucial to remember that music production involves more than sound—it’s storytelling through your unique voice. A good recording studio, like those in Austin, can help you polish your art with mixing & mastering services that bring your vision to life instead of sounding generic or AI-generated. The myth that AI-generated beats can save time and money without consequences is busted by the fact that fully AI-created music might not qualify for copyright protection. This can cut your path to sync licensing opportunities and hurt your creative control in the long run.</p>\n\n<h2>The Art of Overthinking Lyrics</h2>\n<p>Overthinking lyrics is something many recording artists experience, especially when mixing personal emotions with technical songwriting. But sometimes, aiming for perfection or getting caught up in “selling out” fears can drain your creative spark. The challenge doubles when AI is involved—you want to keep your lyrics and beats original and human-authored to maintain copyright protections. Remember, copyright law only protects works with human creative input, so over-relying on AI risks making your music unprotected, leaving you vulnerable.</p>\n<p>Don’t let creative control slip away by giving AI too much power over your music. Instead, use AI as a tool to inspire, but always add your personal touch to lyrics and beats. This keeps your music authentic, original, and safeguardable. Learning to trust your instincts over perfecting every word can lead to stronger songs and a clearer artistic voice.</p>\n\n<h2>Marketing 101 for Musicians</h2>\n<p>In today’s music world, making great beats isn’t enough—you need strong marketing to get noticed. Whether you’re releasing solo tracks or collaborations, promotional strategy matters. Sync licensing opportunities from TV, films, and ads can be a great revenue source, but they usually require you to own the rights to your music. That means beats created solely by AI won’t cut it because they lack copyright protection.</p>\n<p>Focus on creating original, protectable beats by blending your creativity with AI tools, rather than handing over full control. Then leverage social media and music platforms to share your work authentically. And if you want professional polish, a recording studio in Austin with mixing & mastering expertise can amplify your sound for better reach. The music industry is competitive, so maximize your human authorship to maintain your rights and income potential.</p>\n\n<h2>Social Media: Your New Best Friend (or Foe)</h2>\n<p>Social media can feel like a double-edged sword for musicians. On one hand, it’s your fastest way to connect with fans, share your latest tracks, and build your brand. On the other, it can distract you or overwhelm your creative process—especially if you’re chasing trends and copying AI-generated beats that flood these platforms.</p>\n<p>Remember the risks of using AI in music: if your tracks lack human authorship, they might not have copyright protection, which means anyone could remix or reuse your beats without permission. This erodes your creative control and potential royalties. Be mindful of what you post and how you craft your music to keep it original and protected. Using social media to share your genuine style and human-produced music will build a loyal audience that respects your artistry.</p>\n\n<h2>DIY Recording: When All Else Fails</h2>\n<p>Many artists start by recording at home with minimal equipment—sometimes hitting a wall when the sound isn’t quite right. DIY recording can be a great first step, but without access to professional mixing & mastering services, your music might not reach its full potential or sound “radio-ready.” Plus, automating too much of the process with AI tools can risk producing beats that don’t qualify for copyright protection, putting your ownership in jeopardy.</p>\n<p>If budget allows, seek out a local <a href=\"https://www.BlakMarigold.com\">recording studio in Austin</a> to help add polish and human expertise to your tracks. This will protect the originality of your music while helping you learn how to keep your beats human and original. Remember, you’re not alone in the music production journey—professional help ensures your sound stays crisp and your rights stay protected.</p>\n\n<h2>The Myth of 'Selling Out'</h2>\n<p>Many musicians wrestle with the fear of “selling out,” thinking collaborating with brands or experimenting with AI sounds diminishes their art. But the reality is, smart collaborations and using technology responsibly can open new creative doors and income streams like sync licensing for films and commercials. Just be cautious—if AI dominates your music too much, you lose copyright protections and exclusive control.</p>\n<p>Keeping beats human and original while embracing new ideas is the sweet spot where creativity and business meet. Don’t be afraid to mix new tech with your artistry, as long as you maintain your authorship. This balance ensures you benefit from technology like AI without losing your sound or your rights as a recording artist.</p>\n\n<h2>Collaborations: The Double-Edged Sword</h2>\n<p>Collaborations with other musicians or producers bring fresh energy but can also complicate ownership and copyright issues. When AI-generated elements enter the mix without clear human authorship, it muddies who actually owns the music. Sync licensing opportunities, for example, often require clear proof of original, human-created content to avoid disputes and legal grey areas.</p>\n<p>Be transparent about who contributed what and ensure your music production process includes significant human input. When done right, collaborations expand your creative control rather than erode it. Protect your work by keeping these factors in mind and using professional mixing & mastering services in a trusted studio environment, like our <a href=\"https://www.BlakMarigold.com\">Blak Marigold Studio</a> in Austin.</p>\n\n<p>For more insights on how to protect your music and elevate your sound, visit <a href=\"https://www.BlakMarigold.com\">Blak Marigold Studio</a>.</p>\n\n<h2>Sources</h2>\n<ul>\n  <li><a href=\"https://www.bbc.com/news/articles/c8xqv9g8442o\">BBC – AI and Copyright: The Human Author Rule</a></li>\n  <li><a href=\"https://www.billboard.com/pro/ai-generated-songs-cant-copyrighted-tools-report/\">Billboard – AI-Generated Songs and Copyright Challenges</a></li>\n  <li><a href=\"https://tish.law/blog/ai-for-small-businesses-copyright-loopholes-and-legal-landmines-to-avoid/\">Tish Law – Copyright and AI: What Musicians Need to Know</a></li>\n  <li><a href=\"https://www.youtube.com/watch?v=JcCeZUL5iLs\">MixbusTV – Explaining AI in Music Copyright</a></li>\n</ul>\n```\n"
-        }
-      }
-    ]
-  },
   "connections": {
     "On form submission": {
       "main": [
@@ -734,10 +662,5 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ccf4059c-1965-4683-8698-fc9a4d632266",
-  "meta": {
-    "instanceId": "3238db842a9a82014a68f881a5dfc47a12935754270597b4f29f383275e08e78"
-  },
-  "id": "mNuABXk5CtCQhaeH",
   "tags": []
 }
